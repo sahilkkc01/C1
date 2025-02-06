@@ -100,7 +100,6 @@ const TallySheetCartingReadFCL = () => {
     setTotalPackages(totalPackages);
     setTotalPackagesWeight(totalPackagesWeight.toFixed(2));
     setTotalArea(totalArea);
-
   }, [Data, EditAble]);
 
   useEffect(() => {
@@ -185,33 +184,45 @@ const TallySheetCartingReadFCL = () => {
   };
 
   const handleBillPkgW = (truckId, pkg) => {
-    const totalWeight = Data.gross_weight;
-
-    let sbillInput = document.querySelector(`select[name="sbill[${truckId}]"]`);
-    if (!sbillInput) {
-      console.log("Shipping bill input not found!");
-      return;
-    }
-    let sbill = sbillInput.value.trim();
-
-    let no_of_pkgs = 0;
-    let package_weight = 0;
+    const BillLength = Data?.carting_shipping_bill_details?.length;
     let Per_package_weight = 0;
-    Data?.carting_shipping_bill_details?.forEach((details) => {
-      if (details.shipping_bill_number == sbill) {
-        package_weight += parseFloat(details.package_weight) || 0;
-        no_of_pkgs += parseFloat(details.no_of_packages_declared) || 0;
-      }
-    });
-    if (
-      package_weight &&
-      no_of_pkgs &&
-      package_weight != 0 &&
-      no_of_pkgs != 0
-    ) {
-      Per_package_weight += package_weight / no_of_pkgs.toFixed(2);
-    }
+    if (BillLength === 1) {
+      if (Data?.carting_shipping_bill_details?.[0].package_weight == 0) {
+        const totalWeight = parseFloat(Data.gross_weight) || 0;
+        const totalPackages =
+          parseFloat(
+            Data?.carting_shipping_bill_details?.[0].no_of_packages_declared
+          ) || 0;
 
+        Per_package_weight += totalWeight / totalPackages.toFixed(2);
+      }
+    } else {
+      let sbillInput = document.querySelector(
+        `select[name="sbill[${truckId}]"]`
+      );
+      if (!sbillInput) {
+        console.log("Shipping bill input not found!");
+        return;
+      }
+      let sbill = sbillInput.value.trim();
+
+      let no_of_pkgs = 0;
+      let package_weight = 0;
+      Data?.carting_shipping_bill_details?.forEach((details) => {
+        if (details.shipping_bill_number == sbill) {
+          package_weight += parseFloat(details.package_weight) || 0;
+          no_of_pkgs += parseFloat(details.no_of_packages_declared) || 0;
+        }
+      });
+      if (
+        package_weight &&
+        no_of_pkgs &&
+        package_weight != 0 &&
+        no_of_pkgs != 0
+      ) {
+        Per_package_weight += package_weight / no_of_pkgs.toFixed(2);
+      }
+    }
     let weightInput = document.querySelector(
       `input[name="pkgs_weight[${truckId}]"]`
     );
@@ -224,9 +235,6 @@ const TallySheetCartingReadFCL = () => {
     } else {
       console.log("Package weight input not found!");
     }
-
-
-
 
     let totalPackages = 0;
     let totalPackagesWeight = 0;

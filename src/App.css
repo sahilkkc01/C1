@@ -1,0 +1,62 @@
+
+.layout-menu-fixed .layout-navbar-full .layout-menu,
+.layout-menu-fixed-offcanvas .layout-navbar-full .layout-menu {
+  top: 64px !important;
+}
+.layout-page {
+  padding-top: 64px !important;
+}
+.content-wrapper {
+  padding-bottom: 52.625px !important;
+}
+
+.login .form-control{
+  text-transform: none !important;
+}
+.no-scrollbar {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For IE and Edge */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
+
+
+.custom-swal-popup {
+  z-index: 99999 !important; /* Adjust the z-index value as needed */
+}
+
+@media print {
+
+  
+  a,button,Link,.btn{
+    display: none !important;
+  }
+  body {
+      background-color: rgba(0, 0, 0, 0) !important;
+  }
+
+  .A5 .main-p {
+      padding: 0 !important;
+  }
+
+  .A5 h1 {
+      font-size: 18px !important;
+  }
+
+  .A5 .border-bottom-dash {
+      border-bottom: 1px dotted rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .A5 .border-bottoms {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
+  }
+}
+
+
+  /* customStyles.css */
+.rmdp-container {
+  display: block !important; 
+}
+

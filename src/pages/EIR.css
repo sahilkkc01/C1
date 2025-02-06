@@ -1,0 +1,97 @@
+
+.A5{
+    border: 2px solid #e6e5e8 !important;
+    border-radius: 0.5rem !important;
+}
+
+.A5 div,
+.A5 b,
+.A5 p,
+.A5 span,
+.A5 input,
+.A5 label {
+    font-size: 11px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.A5 iframe {
+    margin: 0 1rem !important;
+}
+
+.A5 .main-p {
+    padding: 1rem !important;
+}
+
+.A5 .h1 {
+    font-size: 16px !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 2rem !important;
+}
+
+.A5 p {
+    font-size: 11px !important;
+}
+
+.A5 .fs-small {
+    font-size: 10px !important;
+}
+
+.A5 .form-control {
+    border: none !important;
+    border-radius: 0 !important;
+    padding-left: 0.5rem !important ;
+    font-weight: bold !important;
+}
+
+.A5 .border-bottom-dash {
+    width: 45% !important;
+    border-bottom: 1px dotted !important;
+}
+
+.A5 .border-bottoms {
+    border-bottom: 0.6px solid !important;
+}
+
+.A5 .mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+.A5 .mb-3 {
+    margin-bottom: 0.75rem !important;
+}
+
+.A5 .mb-4 {
+    margin-bottom: 1rem !important;
+}
+
+.A5 .mb-5 {
+    margin-bottom: 1.25rem !important;
+}
+
+.A5 .mb-6 {
+    margin-bottom: 1.5rem !important;
+}
+
+@media print {
+    body {
+        background-color: rgba(0, 0, 0, 0) !important;
+    }
+
+    .A5 .main-p {
+        padding: 0 !important;
+    }
+
+    .A5 h1 {
+        font-size: 18px !important;
+    }
+
+    .A5 .border-bottom-dash {
+        border-bottom: 1px dotted rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .A5 .border-bottoms {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
+    }
+}

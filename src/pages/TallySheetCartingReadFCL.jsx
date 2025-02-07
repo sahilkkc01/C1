@@ -186,16 +186,14 @@ const TallySheetCartingReadFCL = () => {
   const handleBillPkgW = (truckId, pkg) => {
     const BillLength = Data?.carting_shipping_bill_details?.length;
     let Per_package_weight = 0;
-    if (BillLength === 1) {
-      if (Data?.carting_shipping_bill_details?.[0].package_weight == 0) {
+    if (BillLength === 1 && Data?.carting_shipping_bill_details?.[0].package_weight == 0) {
         const totalWeight = parseFloat(Data.gross_weight) || 0;
         const totalPackages =
           parseFloat(
             Data?.carting_shipping_bill_details?.[0].no_of_packages_declared
           ) || 0;
 
-        Per_package_weight += totalWeight / totalPackages.toFixed(2);
-      }
+          Per_package_weight += totalWeight / totalPackages;
     } else {
       let sbillInput = document.querySelector(
         `select[name="sbill[${truckId}]"]`

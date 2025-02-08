@@ -311,9 +311,9 @@ const TallySheetDelivery = () => {
                 <tr>
                   <td>Bill Of Entry</td>
                   <td>
-                    <strong>: {Data?.delivery_bill_details?.map((details,i)=>(
+                    <strong>: {Data?.delivery_bill_details?.map((details, i) => (
                       <>
-                      <span>{details.boe_number},</span>
+                        <span>{details.boe_number},</span>
                       </>
                     ))}</strong>
                   </td>
@@ -422,7 +422,7 @@ const TallySheetDelivery = () => {
                           placeholder="Importer Name"
                         />
                       ) : ( */}
-                        {Data.importer_name}
+                      {Data.importer_name}
                       {/* )} */}
                     </strong>
                   </td>
@@ -561,6 +561,7 @@ const TallySheetDelivery = () => {
                               name={`grid_location[${k}]`}
                               placeholder="Grid Location"
                               defaultValue={Trucks.grid_location}
+                              
                             />
                           </>
                         ) : (
@@ -575,6 +576,7 @@ const TallySheetDelivery = () => {
                               name={`area_m[${k}]`}
                               placeholder="Area"
                               defaultValue={Trucks.area_m}
+                              
                             />
                           </>
                         ) : (
@@ -606,23 +608,10 @@ const TallySheetDelivery = () => {
 
                 {Data.delivery_trucks
                   ? Array.from(
-                      {
-                        length: Math.max(0, 10 - Data.delivery_trucks.length),
-                      },
-                      (_, i) => (
-                        <tr key={i}>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      )
-                    )
-                  : Array.from({ length: 10 }, (_, i) => (
+                    {
+                      length: Math.max(0, 10 - Data.delivery_trucks.length),
+                    },
+                    (_, i) => (
                       <tr key={i}>
                         <td></td>
                         <td></td>
@@ -633,7 +622,20 @@ const TallySheetDelivery = () => {
                         <td></td>
                         <td></td>
                       </tr>
-                    ))}
+                    )
+                  )
+                  : Array.from({ length: 10 }, (_, i) => (
+                    <tr key={i}>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ))}
 
                 <tr>
                   <td>Total</td>

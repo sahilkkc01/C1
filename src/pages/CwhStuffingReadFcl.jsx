@@ -50,7 +50,8 @@ export default function CWHStuffingReadFCL() {
         value.toString().toUpperCase(),
       ])
     );
-    UpdateData(upperCaseFormValues);
+    console.log(upperCaseFormValues);
+    // UpdateData(upperCaseFormValues);
   };
 
   const UpdateData = async (upperCaseFormValues) => {
@@ -226,7 +227,7 @@ export default function CWHStuffingReadFCL() {
                           <div className="d-flex justify-content-between">
                             <h5>Basic Details</h5>
                             <div className="text-end">
-                              <button
+                              {/* <button
                                 type="button"
                                 onClick={() => setReadOnly(!ReadOnly)}
                                 className={`btn ${ReadOnly
@@ -235,7 +236,7 @@ export default function CWHStuffingReadFCL() {
                                   }`}
                               >
                                 {ReadOnly ? "Edit" : "Cancel Edit"}
-                              </button>
+                              </button> */}
                               &nbsp;
                               <button
                                 type="button"

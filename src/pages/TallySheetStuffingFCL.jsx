@@ -166,7 +166,7 @@ const TallySheetStuffingFCL = () => {
     }
   };
 
-  const handleBillPkgW = (id,k, pkg) => {
+  const handleBillPkgW = (id, k, pkg) => {
 
     // let no_of_pkgs = 0;
     // let package_weight = 0;
@@ -368,9 +368,9 @@ const TallySheetStuffingFCL = () => {
                 <tr>
                   <td>Cha Code</td>
                   <td>
-                    <strong>:{Data?.stuffing_shipping_bill_details?.map((details,i)=>(
+                    <strong>:{Data?.stuffing_shipping_bill_details?.map((details, i) => (
                       <>
-                      <span>{details.cha_code} ,</span>
+                        <span>{details.cha_code} ,</span>
                       </>
                     ))}</strong>
                   </td>
@@ -386,9 +386,9 @@ const TallySheetStuffingFCL = () => {
                   </td>
                   <td>Exporter Name</td>
                   <td>
-                  <strong>: {Data?.stuffing_shipping_bill_details?.map((details,i)=>(
+                    <strong>: {Data?.stuffing_shipping_bill_details?.map((details, i) => (
                       <>
-                      <span>{details.cha_name} ,</span>
+                        <span>{details.cha_name} ,</span>
                       </>
                     ))}</strong>
                   </td>
@@ -396,21 +396,21 @@ const TallySheetStuffingFCL = () => {
                 <tr>
                   <td>Handling Type</td>
                   <td>
-                  {EditAble ? (
-                        <>
-                          <select
-                            name="handling_type"
-                            className="form-select"
-                            id=""
-                          >
-                            <option value="LCH">LCH</option>
-                            <option value="MCH">MCH</option>
-                          </select>
-                        </>
-                      ) : (
+                    {EditAble ? (
+                      <>
+                        <select
+                          name="handling_type"
+                          className="form-select"
+                          id=""
+                        >
+                          <option value="LCH">LCH</option>
+                          <option value="MCH">MCH</option>
+                        </select>
+                      </>
+                    ) : (
 
-                        <strong>:   {Data.handling_type}</strong>
-                      )}
+                      <strong>:   {Data.handling_type}</strong>
+                    )}
                   </td>
                 </tr>
               </tbody>
@@ -492,7 +492,7 @@ const TallySheetStuffingFCL = () => {
                             name={`no_of_packages_declared[${i}]`}
                             defaultValue={Details.no_of_packages_declared}
                             onKeyUp={(e) =>
-                              handleBillPkgW(Details.id ,i, e.target.value)
+                              handleBillPkgW(Details.id, i, e.target.value)
                             }
                             placeholder="No of package"
                           />
@@ -524,6 +524,7 @@ const TallySheetStuffingFCL = () => {
                             name={`grid_locations[${i}]`}
                             defaultValue={Details.grid_locations}
                             placeholder="Grid Location"
+                            required
                           />
                         </>
                       ) : (
@@ -538,6 +539,7 @@ const TallySheetStuffingFCL = () => {
                             name={`area[${i}]`}
                             defaultValue={Details.area}
                             placeholder="Area"
+                            required
                           />
                         </>
                       ) : (
@@ -568,26 +570,13 @@ const TallySheetStuffingFCL = () => {
                 </tr>
                 {Data?.stuffing_shipping_bill_details
                   ? Array.from(
-                      {
-                        length: Math.max(
-                          0,
-                          10 - Data.stuffing_shipping_bill_details.length
-                        ),
-                      },
-                      (_, i) => (
-                        <tr key={i}>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      )
-                    )
-                  : Array.from({ length: 10 }, (_, i) => (
+                    {
+                      length: Math.max(
+                        0,
+                        10 - Data.stuffing_shipping_bill_details.length
+                      ),
+                    },
+                    (_, i) => (
                       <tr key={i}>
                         <td></td>
                         <td></td>
@@ -598,7 +587,20 @@ const TallySheetStuffingFCL = () => {
                         <td></td>
                         <td></td>
                       </tr>
-                    ))}
+                    )
+                  )
+                  : Array.from({ length: 10 }, (_, i) => (
+                    <tr key={i}>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ))}
 
                 <tr>
                   <td>Total</td>

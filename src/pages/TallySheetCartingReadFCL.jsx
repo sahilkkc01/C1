@@ -187,13 +187,13 @@ const TallySheetCartingReadFCL = () => {
     const BillLength = Data?.carting_shipping_bill_details?.length;
     let Per_package_weight = 0;
     if (BillLength === 1 && Data?.carting_shipping_bill_details?.[0].package_weight == 0) {
-        const totalWeight = parseFloat(Data.gross_weight) || 0;
-        const totalPackages =
-          parseFloat(
-            Data?.carting_shipping_bill_details?.[0].no_of_packages_declared
-          ) || 0;
+      const totalWeight = parseFloat(Data.gross_weight) || 0;
+      const totalPackages =
+        parseFloat(
+          Data?.carting_shipping_bill_details?.[0].no_of_packages_declared
+        ) || 0;
 
-          Per_package_weight += totalWeight / totalPackages;
+      Per_package_weight += totalWeight / totalPackages;
     } else {
       let sbillInput = document.querySelector(
         `select[name="sbill[${truckId}]"]`
@@ -612,6 +612,7 @@ const TallySheetCartingReadFCL = () => {
                                 name={`grid_location[${index}]`}
                                 placeholder="Grid Location"
                                 defaultValue={Trucks.grid_location}
+                                required
                               />
                             </>
                           ) : (
@@ -626,6 +627,7 @@ const TallySheetCartingReadFCL = () => {
                                 name={`area_m[${index}]`}
                                 placeholder="Area"
                                 defaultValue={Trucks.area_m}
+                                required
                               />
                             </>
                           ) : (
@@ -777,24 +779,10 @@ const TallySheetCartingReadFCL = () => {
 
                 {Data.carting_trucks
                   ? Array.from(
-                      {
-                        length: Math.max(0, 10 - Data.carting_trucks.length),
-                      },
-                      (_, i) => (
-                        <tr key={i}>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      )
-                    )
-                  : Array.from({ length: 10 }, (_, i) => (
+                    {
+                      length: Math.max(0, 10 - Data.carting_trucks.length),
+                    },
+                    (_, i) => (
                       <tr key={i}>
                         <td></td>
                         <td></td>
@@ -806,7 +794,21 @@ const TallySheetCartingReadFCL = () => {
                         <td></td>
                         <td></td>
                       </tr>
-                    ))}
+                    )
+                  )
+                  : Array.from({ length: 10 }, (_, i) => (
+                    <tr key={i}>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ))}
 
                 <tr>
                   <td>Total</td>

@@ -460,7 +460,7 @@ const TallySheetDeStuffingFCL = () => {
                               name={`no_of_packages_declared[${Details.id}]`}
                               placeholder="No of package"
                               onKeyUp={(e) =>
-                                handleBillPkgW(Details.id , e.target.value)
+                                handleBillPkgW(Details.id, e.target.value)
                               }
                               defaultValue={Details.no_of_packages_declared}
                             />
@@ -470,7 +470,7 @@ const TallySheetDeStuffingFCL = () => {
                         )}
                       </td>
                       <td>
-                      {EditAble ? (
+                        {EditAble ? (
                           <>
                             <input
                               className="form-control p-1"
@@ -482,8 +482,8 @@ const TallySheetDeStuffingFCL = () => {
                         ) : (
                           Details.package_weight
                         )}
-                        
-                       </td>
+
+                      </td>
                       <td>
                         {EditAble ? (
                           <>
@@ -492,6 +492,7 @@ const TallySheetDeStuffingFCL = () => {
                               name={`grid_locations[${Details.id}]`}
                               placeholder="Grid Location"
                               defaultValue={Details.grid_locations}
+                              required
                             />
                           </>
                         ) : (
@@ -506,6 +507,7 @@ const TallySheetDeStuffingFCL = () => {
                               name={`area[${Details.id}]`}
                               defaultValue={Details.area}
                               placeholder="Area"
+                              required
                             />
                           </>
                         ) : (
@@ -516,25 +518,13 @@ const TallySheetDeStuffingFCL = () => {
                   ))}
                 {Data.de_stuffing_bill_details
                   ? Array.from(
-                      {
-                        length: Math.max(
-                          0,
-                          10 - Data.de_stuffing_bill_details.length
-                        ),
-                      },
-                      (_, i) => (
-                        <tr key={i}>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      )
-                    )
-                  : Array.from({ length: 10 }, (_, i) => (
+                    {
+                      length: Math.max(
+                        0,
+                        10 - Data.de_stuffing_bill_details.length
+                      ),
+                    },
+                    (_, i) => (
                       <tr key={i}>
                         <td></td>
                         <td></td>
@@ -544,7 +534,19 @@ const TallySheetDeStuffingFCL = () => {
                         <td></td>
                         <td></td>
                       </tr>
-                    ))}
+                    )
+                  )
+                  : Array.from({ length: 10 }, (_, i) => (
+                    <tr key={i}>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ))}
 
                 <tr>
                   <td>Total</td>

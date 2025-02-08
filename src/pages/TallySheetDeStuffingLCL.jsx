@@ -124,7 +124,7 @@ const TallySheetDeStuffingLCL = () => {
         timer: 3000,
         showConfirmButton: false,
       });
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -444,7 +444,7 @@ const TallySheetDeStuffingLCL = () => {
                               name={`no_of_packages_declared[${Details.id}]`}
                               defaultValue={Details.no_of_packages_declared}
                               onKeyUp={(e) =>
-                                handleBillPkgW(Details.id , e.target.value)
+                                handleBillPkgW(Details.id, e.target.value)
                               }
                               placeholder="No of package"
                             />
@@ -477,6 +477,7 @@ const TallySheetDeStuffingLCL = () => {
                               name={`grid_locations[${Details.id}]`}
                               placeholder="Grid Location"
                               defaultValue={Details.grid_locations}
+                              required
                             />
                           </>
                         ) : (
@@ -491,6 +492,7 @@ const TallySheetDeStuffingLCL = () => {
                               name={`area[${Details.id}]`}
                               placeholder="Area"
                               defaultValue={Details.area}
+                              required
                             />
                           </>
                         ) : (
@@ -501,25 +503,13 @@ const TallySheetDeStuffingLCL = () => {
                   ))}
                 {Data.de_stuffing_bill_details
                   ? Array.from(
-                      {
-                        length: Math.max(
-                          0,
-                          10 - Data.de_stuffing_bill_details.length
-                        ),
-                      },
-                      (_, i) => (
-                        <tr key={i}>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      )
-                    )
-                  : Array.from({ length: 10 }, (_, i) => (
+                    {
+                      length: Math.max(
+                        0,
+                        10 - Data.de_stuffing_bill_details.length
+                      ),
+                    },
+                    (_, i) => (
                       <tr key={i}>
                         <td></td>
                         <td></td>
@@ -529,7 +519,19 @@ const TallySheetDeStuffingLCL = () => {
                         <td></td>
                         <td></td>
                       </tr>
-                    ))}
+                    )
+                  )
+                  : Array.from({ length: 10 }, (_, i) => (
+                    <tr key={i}>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ))}
 
                 <tr>
                   <td>Total</td>

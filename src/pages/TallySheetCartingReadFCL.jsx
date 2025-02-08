@@ -316,7 +316,7 @@ const TallySheetCartingReadFCL = () => {
               <tbody>
                 <tr>
                   <td>Sbill Number</td>
-                  <td>
+                  <td className="text-wrap">
                     <strong>
                       :
                       {Data?.carting_shipping_bill_details?.map((de, i) => {

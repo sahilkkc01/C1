@@ -281,7 +281,7 @@ const TallySheetStuffingFCL = () => {
               <tbody>
                 <tr>
                   <td>Sbill Number</td>
-                  <td>
+                  <td className="text-wrap">
                     <strong>
                       :
                       {Data?.stuffing_shipping_bill_details?.map((bills, i) => (

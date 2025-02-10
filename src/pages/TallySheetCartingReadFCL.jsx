@@ -262,6 +262,13 @@ const TallySheetCartingReadFCL = () => {
     setTotalArea(totalArea);
   };
 
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z0-9 ]*$/.test(value)) {
+      // setInputValue(value);
+    }
+  };
   return (
     <>
       {loading && (
@@ -612,6 +619,10 @@ const TallySheetCartingReadFCL = () => {
                                 name={`grid_location[${index}]`}
                                 placeholder="Grid Location"
                                 defaultValue={Trucks.grid_location}
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                  e.target.value = value;
+                                }}
                                 required
                               />
                             </>

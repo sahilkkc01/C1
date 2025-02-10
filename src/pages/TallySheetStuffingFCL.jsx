@@ -524,6 +524,10 @@ const TallySheetStuffingFCL = () => {
                             name={`grid_locations[${i}]`}
                             defaultValue={Details.grid_locations}
                             placeholder="Grid Location"
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                              e.target.value = value;
+                            }}
                             required
                           />
                         </>

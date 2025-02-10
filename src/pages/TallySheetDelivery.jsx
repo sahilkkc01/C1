@@ -561,6 +561,10 @@ const TallySheetDelivery = () => {
                               name={`grid_location[${k}]`}
                               placeholder="Grid Location"
                               defaultValue={Trucks.grid_location}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                e.target.value = value;
+                              }}
                               
                             />
                           </>

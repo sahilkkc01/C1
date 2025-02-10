@@ -42,8 +42,6 @@ export default function GateIN() {
   const [ocr_vehicle_number, setOcr_vehicle_number] = useState("");
   const [vehicle_no_image, setVehicle_no_image] = useState("");
 
-  
-
   let html5QrCode;
   const stopQrScanner = () => {
     if (html5QrCode) {
@@ -222,22 +220,20 @@ export default function GateIN() {
     formEntries.type = type;
     formEntries.gate_no = gate_no;
     formEntries.lane_no = lane_no;
-    formEntries.gate_name = 'EXIM';
+    formEntries.gate_name = "EXIM";
     formEntries.created_by = user.id;
-    
-    
-    
+
     console.log(formEntries);
 
     setLoading(true);
     const url = `https://ctas.live/backend/api/gate/surveyData/post`;
     // const url = `http://127.0.0.1:8000/api/gate/surveyData/post`;
-    
+
     try {
       const response = await axios.post(url, formEntries, {
         headers: { "Content-Type": "application/json" },
       });
-      if (response.data.status && response.data.status == 'success') {
+      if (response.data.status && response.data.status == "success") {
         // setData(response.data.data);
         // alert(response.data.message)
         Swal.fire({
@@ -297,6 +293,28 @@ export default function GateIN() {
     }
   };
 
+  const [Photos, setPhotos] = useState({
+    driverPhoto: null,
+    driverLicense: null,
+    driverEBill: null,
+    seal1: null,
+    seal2: null,
+  });
+
+  const handleImageChange = (event, name) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotos((prevPhotos) => ({
+          ...prevPhotos,
+          [name]: reader.result, // Dynamically update the correct field
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <>
       <div class="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
@@ -307,19 +325,20 @@ export default function GateIN() {
             <div className="content-wrapper">
               <div className="container-xxl flex-grow-1 container-p-y">
                 <form
-                  className="row align-items-center position-relative"
+                  className="row align-items-center justify-content-center position-relative"
                   onSubmit={handleFormSubmit}
                 >
-                  <div className={`text-center col-md-5 col-sm-5 mt-12`}>
+                  {/* <div className={`text-center col-md-5 col-sm-5 mt-12`}>
                     <img
                       src="/assets/images/isometric-vehicle.png"
                       className="w-100"
                       style={{ transform: "scaleX(-1)" }}
                       alt=""
                     />
-                  </div>
+                  </div> */}
 
-                  <div className="col-md-6 col-sm-7  position-absolute top-0 end-0 me-8">
+                  {/* <div className="col-md-6 col-sm-7  position-absolute top-0 end-0 me-8"> */}
+                  <div className="col-md-6 col-sm-7  ">
                     {showScreen && showScreen == "Gate" ? (
                       <>
                         <div className="ms-auto col-md-12 text-center">
@@ -686,7 +705,11 @@ export default function GateIN() {
                             <h4 className="m-0">Vehicles</h4>
                           </div>
                           <div className="col-md-6 text-end">
-                            <a href="#" className="btn btn-info"  onClick={() => setNewVehicle(true)}>
+                            <a
+                              href="#"
+                              className="btn btn-info btn-sm"
+                              onClick={() => setNewVehicle(true)}
+                            >
                               Add New Vehicle
                             </a>
                           </div>
@@ -697,30 +720,41 @@ export default function GateIN() {
                               <div className="form col-md-6">
                                 <label htmlFor="">Enter Vehicle Number</label>
                                 <input
-                                  type="text" className="form-control" name="ocr_vehicle_number" onChange={(e) => setOcr_vehicle_number(e.target.value)}   placeholder="Vehicle No" />
+                                  type="text"
+                                  className="form-control"
+                                  name="ocr_vehicle_number"
+                                  onChange={(e) =>
+                                    setOcr_vehicle_number(e.target.value)
+                                  }
+                                  placeholder="Vehicle No"
+                                />
                                 <hr />
                                 <label htmlFor="">Caputre Image</label>
                                 <input
                                   type="file"
                                   className="form-control"
-                                  onChange={(e) => setVehicle_no_image(e.target.value)}
+                                  onChange={(e) =>
+                                    setVehicle_no_image(e.target.value)
+                                  }
                                   name="vehicle_no_image"
                                   placeholder="Vehicle No"
                                 />
-                                
+
                                 <hr />
                                 <button
                                   type="button"
                                   className="btn btn-success m-0  w-100"
                                   onClick={() => {
                                     setShowScreen("Permit");
-                                    setSelectedData({id:0});
+                                    setSelectedData({ id: 0 });
                                   }}
                                 >
                                   Start Survey
                                 </button>
                               </div>
-                            ) : <></>}
+                            ) : (
+                              <></>
+                            )}
                             {Data &&
                               Data.map((row, i) => (
                                 <div className="col-md-6">
@@ -807,7 +841,6 @@ export default function GateIN() {
                               >
                                 <i className="ri-camera-line me-1"></i> Driver
                                 Photo
-                              </label>
                               <input
                                 type="file"
                                 id="DriverPhoto"
@@ -815,7 +848,25 @@ export default function GateIN() {
                                 className="d-none "
                                 accept="image/*"
                                 capture="environment"
-                              />
+                                onChange={(e) =>
+                                  handleImageChange(e, "driverPhoto")
+                                }
+                                />
+                                </label>
+                              {Photos?.driverPhoto && (
+                                <div className="mt-2">
+                                  <img
+                                    src={Photos.driverPhoto}
+                                    alt="Driver"
+                                    className="img-thumbnail rounded-3"
+                                    style={{
+                                      width: "100px",
+                                      height: "100px",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                </div>
+                              )}
                             </div>
                             <div className="col-4">
                               <label
@@ -824,7 +875,6 @@ export default function GateIN() {
                               >
                                 <i className="ri-camera-line me-1"></i> Driver
                                 License
-                              </label>
                               <input
                                 type="file"
                                 id="DriverLicense"
@@ -832,7 +882,25 @@ export default function GateIN() {
                                 name="driver_license"
                                 accept="image/*"
                                 capture="environment"
-                              />
+                                onChange={(e) =>
+                                  handleImageChange(e, "driverLicense")
+                                }
+                                />
+                                </label>
+                              {Photos?.driverLicense && (
+                                <div className="mt-2">
+                                  <img
+                                    src={Photos.driverLicense}
+                                    alt="Driver"
+                                    className="img-thumbnail rounded-3"
+                                    style={{
+                                      width: "100px",
+                                      height: "100px",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                </div>
+                              )}
                             </div>
                             {type && type == "IN" ? (
                               <div className="col-4">
@@ -1191,7 +1259,7 @@ export default function GateIN() {
                                               type="file"
                                               id="containerImage1"
                                               className="d-none"
-                                            name="1_empty_contianer_image"
+                                              name="1_empty_contianer_image"
                                               accept="image/*"
                                               capture="environment"
                                             />

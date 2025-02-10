@@ -563,7 +563,7 @@ export default function Index() {
                                         className="form-control"
                                         readOnly={true}
                                         defaultValue={formatToDateTimeLocal(
-                                          Data?.permitdatetime
+                                          Data?.ispermitvalid
                                         )}
                                       />
                                       <label htmlFor="">

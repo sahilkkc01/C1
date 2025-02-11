@@ -152,6 +152,28 @@ export default function IndexROut() {
     submitData(formValues);
   };
 
+
+  
+    const [Photos, setPhotos] = useState({
+      seal1: null,
+      seal2: null,
+      container: null,
+    });
+  
+    const handleImageChange = (event, name) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPhotos((prevPhotos) => ({
+            ...prevPhotos,
+            [name]: reader.result,
+          }));
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    
   return (
     <>
       {loading ? (
@@ -493,8 +515,9 @@ export default function IndexROut() {
                             </>
                           )}
 
-                          <div className="col-md-12 my-3">
+<div className="col-md-12 my-3">
                             {ContainerType == "Empty" ? (
+                              <>
                               <label
                                 htmlFor="container_image"
                                 className="btn btn-outline-info btn-sm me-2"
@@ -508,41 +531,99 @@ export default function IndexROut() {
                                   className="d-none"
                                   accept="image/*"
                                   capture="environment"
+                                  onChange={(e) =>
+                                    handleImageChange(e, "container")
+                                  }
                                 />
                               </label>
+                              {Photos?.container && (
+                                <div className="mt-2">
+                                  <img
+                                    src={Photos.container}
+                                    alt="Custom Seal"
+                                    className="img-thumbnail rounded-3"
+                                    style={{
+                                      width: "100px",
+                                      height: "100px",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              </>
                             ) : (
                               ContainerType == "Laden" && (
                                 <>
-                                  <label
-                                    htmlFor="seal_1_image"
-                                    className="btn btn-outline-info btn-sm me-2"
-                                  >
-                                    <i className="ri-camera-fill me-1"></i>{" "}
-                                    Linear Seal
-                                    <input
-                                      type="file"
-                                      id="seal_1_image"
-                                      name="seal_1_image"
-                                      className="d-none"
-                                      accept="image/*"
-                                      capture="environment"
-                                    />
-                                  </label>
-                                  <label
-                                    htmlFor="seal_2_image"
-                                    className="btn btn-outline-info btn-sm me-2"
-                                  >
-                                    <i className="ri-camera-fill me-1"></i>
-                                    Custom Seal
-                                    <input
-                                      type="file"
-                                      id="seal_2_image"
-                                      name="seal_2_image"
-                                      className="d-none"
-                                      accept="image/*"
-                                      capture="environment"
-                                    />
-                                  </label>
+                                  <div className="d-flex align-items-center gap-4">
+                                    <div className="">
+                                      <label
+                                        htmlFor="seal_1_image"
+                                        className="btn btn-outline-info btn-sm me-2"
+                                      >
+                                        <i className="ri-camera-fill me-1"></i>{" "}
+                                        Linear Seal
+                                        <input
+                                          type="file"
+                                          id="seal_1_image"
+                                          name="seal_1_image"
+                                          className="d-none"
+                                          accept="image/*"
+                                          capture="environment"
+                                          onChange={(e) =>
+                                            handleImageChange(e, "seal1")
+                                          }
+                                        />
+                                      </label>
+                                      {Photos?.seal1 && (
+                                        <div className="mt-2">
+                                          <img
+                                            src={Photos.seal1}
+                                            alt="Linear Seal"
+                                            className="img-thumbnail rounded-3"
+                                            style={{
+                                              width: "100px",
+                                              height: "100px",
+                                              objectFit: "cover",
+                                            }}
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="">
+                                      <label
+                                        htmlFor="seal_2_image"
+                                        className="btn btn-outline-info btn-sm me-2"
+                                      >
+                                        <i className="ri-camera-fill me-1"></i>
+                                        Custom Seal
+                                        <input
+                                          type="file"
+                                          id="seal_2_image"
+                                          name="seal_2_image"
+                                          className="d-none"
+                                          accept="image/*"
+                                          capture="environment"
+                                          onChange={(e) =>
+                                            handleImageChange(e, "seal2")
+                                          }
+                                        />
+                                      </label>
+                                      {Photos?.seal2 && (
+                                        <div className="mt-2">
+                                          <img
+                                            src={Photos.seal2}
+                                            alt="Custom Seal"
+                                            className="img-thumbnail rounded-3"
+                                            style={{
+                                              width: "100px",
+                                              height: "100px",
+                                              objectFit: "cover",
+                                            }}
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
                                 </>
                               )
                             )}

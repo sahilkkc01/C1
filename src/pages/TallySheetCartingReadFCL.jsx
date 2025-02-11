@@ -411,6 +411,7 @@ const TallySheetCartingReadFCL = () => {
                             type="datetime-local"
                             className="form-control p-1"
                             name="end_time"
+                            defaultValue={formatToDateTimeLocal(today)}
                           />
                         </>
                       ) : (

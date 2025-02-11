@@ -19,6 +19,7 @@ const TallySheetDelivery = () => {
   const [totalPackages, setTotalPackages] = useState(0);
   const [totalPackagesWeight, setTotalPackagesWeight] = useState(0);
   const [totalArea, setTotalArea] = useState(0);
+    const [Area, setArea] = useState({});
 
   // const [TruckCount, setTruckCount] = useState(0);
 
@@ -91,7 +92,10 @@ const TallySheetDelivery = () => {
       Data.delivery_trucks.forEach((Details) => {
         totalPackages += parseInt(Details.no_of_pkgs ?? 0);
         totalPackagesWeight += parseFloat(Details.pkgs_weight ?? 0);
-        totalArea += parseFloat(Details.area_m ?? 0);
+        // totalArea += parseFloat(Details.area_m ?? 0);
+        Details?.grid_area?.map((grid_area)=>(
+          totalArea +=  parseFloat(grid_area.area??0)
+        ))
       });
       setTotalPackages(totalPackages);
       setTotalPackagesWeight(totalPackagesWeight);
@@ -238,7 +242,10 @@ const TallySheetDelivery = () => {
 
         totalPackages += parseInt(no_of_pkgs);
         totalPackagesWeight += parseFloat(pkgs_weight);
-        totalArea += parseFloat(area_m);
+        // totalArea += parseFloat(area_m);
+        Details?.grid_area?.map((grid_area)=>(
+          totalArea +=  parseFloat(grid_area.area)
+        ))
       });
     }
 
@@ -556,16 +563,25 @@ const TallySheetDelivery = () => {
                       <td>
                         {EditAble ? (
                           <>
-                            <input
+                            <textarea
                               className="form-control p-1"
                               name={`grid_location[${k}]`}
                               placeholder="Grid Location"
                               defaultValue={Trucks.grid_location}
                               onChange={(e) => {
-                                const value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                const value = e.target.value.replace(
+                                  /[^a-zA-Z0-9 ]/g,
+                                  ""
+                                );
                                 e.target.value = value;
+                                const values = value.split(" ");
+
+                                setArea((prev) => ({
+                                  ...prev,
+                                  [`area[${k}]`]: values,
+                                }));
                               }}
-                              
+                              required
                             />
                           </>
                         ) : (
@@ -575,18 +591,37 @@ const TallySheetDelivery = () => {
                       <td>
                         {EditAble ? (
                           <>
-                            <input
-                              className="form-control p-1"
-                              name={`area_m[${k}]`}
-                              placeholder="Area"
-                              defaultValue={Trucks.area_m}
-                              
-                            />
+                            {Area[`area[${k}]`] ? ( 
+                              Area[`area[${k}]`].map((area, q) => (
+                                <label className="mb-1">
+                                  {area.toUpperCase()}
+                                <input
+                                className="form-control p-1"
+                                type=""
+                                name={`area[${k}][${area.toUpperCase()}]`}
+                                // defaultValue={area.toUpperCase()}
+                                placeholder="Area"
+                                required
+                              />
+                              </label>
+                              ))
+                            ) : (
+                              <input
+                                className="form-control p-1"
+                                name={`area[${k}]`}
+                                defaultValue={Trucks.area}
+                                placeholder="Area"
+                                required
+                              />
+                            )}
                           </>
                         ) : (
-                          Trucks.area_m
+                          Trucks?.grid_area?.map((grid_area)=>(
+                            <span>{grid_area.area} ,</span>
+                          ))
                         )}
                       </td>
+
                     </tr>
                   ))}
                 <tr>

@@ -16,6 +16,7 @@ const TallySheetDeStuffingLCL = () => {
   const [totalPackages, setTotalPackages] = useState(0);
   const [totalPackagesWeight, setTotalPackagesWeight] = useState(0);
   const [totalArea, setTotalArea] = useState(0);
+  const [Area, setArea] = useState({});
 
   useEffect(() => {
     GetData();
@@ -58,7 +59,10 @@ const TallySheetDeStuffingLCL = () => {
       Data.de_stuffing_bill_details.forEach((Details) => {
         totalPackages += parseInt(Details.no_of_packages_declared ?? 0);
         totalPackagesWeight += parseFloat(Details.package_weight ?? 0);
-        totalArea += parseFloat(Details.area ?? 0);
+        // totalArea += parseFloat(Details.area ?? 0);
+        Details?.grid_area?.map((grid_area)=>(
+          totalArea +=  parseFloat(grid_area.area)
+        ))
       });
 
       setTotalPackages(totalPackages);
@@ -180,7 +184,10 @@ const TallySheetDeStuffingLCL = () => {
 
         totalPackages += parseInt(no_of_pkgs);
         totalPackagesWeight += parseFloat(pkgs_weight);
-        totalArea += parseFloat(area_m);
+        // totalArea += parseFloat(area_m);
+        Details?.grid_area?.map((grid_area)=>(
+          totalArea +=  parseFloat(grid_area.area)
+        ))
       });
     }
 
@@ -340,6 +347,7 @@ const TallySheetDeStuffingLCL = () => {
                           type="datetime-local"
                           className="form-control p-1"
                           name="end_time"
+                           defaultValue={formatToDateTimeLocal(today)}
                         />
                       </>
                     ) : (
@@ -472,14 +480,23 @@ const TallySheetDeStuffingLCL = () => {
                       <td>
                         {EditAble ? (
                           <>
-                            <input
+                            <textarea
                               className="form-control p-1"
                               name={`grid_locations[${Details.id}]`}
                               placeholder="Grid Location"
                               defaultValue={Details.grid_locations}
                               onChange={(e) => {
-                                const value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                const value = e.target.value.replace(
+                                  /[^a-zA-Z0-9 ]/g,
+                                  ""
+                                );
                                 e.target.value = value;
+                                const values = value.split(" ");
+
+                                setArea((prev) => ({
+                                  ...prev,
+                                  [`area[${Details.id}]`]: values,
+                                }));
                               }}
                               required
                             />
@@ -491,16 +508,34 @@ const TallySheetDeStuffingLCL = () => {
                       <td>
                         {EditAble ? (
                           <>
-                            <input
-                              className="form-control p-1"
-                              name={`area[${Details.id}]`}
-                              placeholder="Area"
-                              defaultValue={Details.area}
-                              required
-                            />
+                            {Area[`area[${Details.id}]`] ? ( 
+                              Area[`area[${Details.id}]`].map((area, q) => (
+                                <label className="mb-1">
+                                  {area.toUpperCase()}
+                                <input
+                                className="form-control p-1"
+                                type=""
+                                name={`area[${Details.id}][${area.toUpperCase()}]`}
+                                // defaultValue={area.toUpperCase()}
+                                placeholder="Area"
+                                required
+                              />
+                              </label>
+                              ))
+                            ) : (
+                              <input
+                                className="form-control p-1"
+                                name={`area[${Details.id}]`}
+                                defaultValue={Details.area}
+                                placeholder="Area"
+                                required
+                              />
+                            )}
                           </>
                         ) : (
-                          Details.area
+                          Details?.grid_area?.map((grid_area)=>(
+                            <span>{grid_area.area} ,</span>
+                          ))
                         )}
                       </td>
                     </tr>

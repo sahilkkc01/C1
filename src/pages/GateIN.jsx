@@ -297,6 +297,9 @@ export default function GateIN() {
     driverPhoto: null,
     driverLicense: null,
     driverEBill: null,
+    driverCustom: null,
+    permit: null,
+    specialPermit: null,
     seal1: null,
     seal2: null,
   });
@@ -322,23 +325,25 @@ export default function GateIN() {
           <Nav />
 
           <div className="layout-page">
-            <div className="content-wrapper">
-              <div className="container-xxl flex-grow-1 container-p-y">
+            <div
+              className="content-wrapper"
+              style={{
+                backgroundImage: "url('/background.webp')",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                opacity: 0.9,
+              }}
+            >
+              <div
+                className="container-xxl flex-grow-1 container-p-y "
+                style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+              >
                 <form
-                  className="row align-items-center justify-content-center position-relative"
+                  className="row align-items-center justify-content-center "
                   onSubmit={handleFormSubmit}
                 >
-                  {/* <div className={`text-center col-md-5 col-sm-5 mt-12`}>
-                    <img
-                      src="/assets/images/isometric-vehicle.png"
-                      className="w-100"
-                      style={{ transform: "scaleX(-1)" }}
-                      alt=""
-                    />
-                  </div> */}
-
-                  {/* <div className="col-md-6 col-sm-7  position-absolute top-0 end-0 me-8"> */}
-                  <div className="col-md-6 col-sm-7  ">
+                  <div className="col-md-5 col-sm-7  ">
                     {showScreen && showScreen == "Gate" ? (
                       <>
                         <div className="ms-auto col-md-12 text-center">
@@ -365,7 +370,7 @@ export default function GateIN() {
                             Out Gate
                           </a>
                         </div>
-                        <div className="card">
+                        <div className="card bg-none">
                           <div className="card-body border-bottom py-2 px-1">
                             <h4 className="m-0 text-center">
                               Select Gate Number
@@ -841,18 +846,18 @@ export default function GateIN() {
                               >
                                 <i className="ri-camera-line me-1"></i> Driver
                                 Photo
-                              <input
-                                type="file"
-                                id="DriverPhoto"
-                                name="driver_photo"
-                                className="d-none "
-                                accept="image/*"
-                                capture="environment"
-                                onChange={(e) =>
-                                  handleImageChange(e, "driverPhoto")
-                                }
+                                <input
+                                  type="file"
+                                  id="DriverPhoto"
+                                  name="driver_photo"
+                                  className="d-none "
+                                  accept="image/*"
+                                  capture="environment"
+                                  onChange={(e) =>
+                                    handleImageChange(e, "driverPhoto")
+                                  }
                                 />
-                                </label>
+                              </label>
                               {Photos?.driverPhoto && (
                                 <div className="mt-2">
                                   <img
@@ -875,18 +880,18 @@ export default function GateIN() {
                               >
                                 <i className="ri-camera-line me-1"></i> Driver
                                 License
-                              <input
-                                type="file"
-                                id="DriverLicense"
-                                className="d-none "
-                                name="driver_license"
-                                accept="image/*"
-                                capture="environment"
-                                onChange={(e) =>
-                                  handleImageChange(e, "driverLicense")
-                                }
+                                <input
+                                  type="file"
+                                  id="DriverLicense"
+                                  className="d-none "
+                                  name="driver_license"
+                                  accept="image/*"
+                                  capture="environment"
+                                  onChange={(e) =>
+                                    handleImageChange(e, "driverLicense")
+                                  }
                                 />
-                                </label>
+                              </label>
                               {Photos?.driverLicense && (
                                 <div className="mt-2">
                                   <img
@@ -909,34 +914,68 @@ export default function GateIN() {
                                   className="btn btn-secondary btn-sm"
                                 >
                                   <i className="ri-camera-line me-1"></i> E Bill
+                                  <input
+                                    type="file"
+                                    id="e_bill"
+                                    className="d-none "
+                                    name="e_bill"
+                                    accept="image/*"
+                                    capture="environment"
+                                    onChange={(e) =>
+                                      handleImageChange(e, "driverEBill")
+                                    }
+                                  />
                                 </label>
-                                <input
-                                  type="file"
-                                  id="e_bill"
-                                  className="d-none "
-                                  name="e_bill"
-                                  accept="image/*"
-                                  capture="environment"
-                                />
+                                {Photos?.driverEBill && (
+                                  <div className="mt-2">
+                                    <img
+                                      src={Photos.driverEBill}
+                                      alt="Driver"
+                                      className="img-thumbnail rounded-3"
+                                      style={{
+                                        width: "100px",
+                                        height: "100px",
+                                        objectFit: "cover",
+                                      }}
+                                    />
+                                  </div>
+                                )}
                               </div>
                             ) : (
                               <>
                                 <div className="col-4">
                                   <label
-                                    htmlFor="custome_documents"
+                                    htmlFor="custom_documents"
                                     className="btn btn-secondary btn-sm"
                                   >
                                     <i className="ri-camera-line me-1"></i>{" "}
-                                    Custome Documents
+                                    Custom Documents
+                                    <input
+                                      type="file"
+                                      id="custom_documents"
+                                      className="d-none "
+                                      name="custom_documents"
+                                      accept="image/*"
+                                      capture="environment"
+                                      onChange={(e) =>
+                                        handleImageChange(e, "driverCustom")
+                                      }
+                                    />
                                   </label>
-                                  <input
-                                    type="file"
-                                    id="custome_documents"
-                                    className="d-none "
-                                    name="custome_documents"
-                                    accept="image/*"
-                                    capture="environment"
-                                  />
+                                  {Photos?.driverCustom && (
+                                    <div className="mt-2">
+                                      <img
+                                        src={Photos.driverCustom}
+                                        alt="Driver"
+                                        className="img-thumbnail rounded-3"
+                                        style={{
+                                          width: "100px",
+                                          height: "100px",
+                                          objectFit: "cover",
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               </>
                             )}
@@ -990,22 +1029,39 @@ export default function GateIN() {
                                 </label>
                               </div>
                               {isSpecialPermit && (
-                                <div className="">
+                                <div className="d-flex align-items-center gap-5">
                                   <label
                                     htmlFor="special_permit"
                                     className="btn btn-secondary"
                                   >
                                     <i className="ri-camera-line me-2"></i>{" "}
                                     Special Permit
+                                    <input
+                                      type="file"
+                                      name="special_permit"
+                                      id="special_permit"
+                                      className="d-none "
+                                      accept="image/*"
+                                      capture="environment"
+                                      onChange={(e) =>
+                                        handleImageChange(e, "specialPermit")
+                                      }
+                                    />
                                   </label>
-                                  <input
-                                    type="file"
-                                    name="special_permit"
-                                    id="special_permit"
-                                    className="d-none "
-                                    accept="image/*"
-                                    capture="environment"
-                                  />
+                                  {Photos?.specialPermit && (
+                                    <div className="mt-2">
+                                      <img
+                                        src={Photos.specialPermit}
+                                        alt="specialPermit"
+                                        className="img-thumbnail rounded-3"
+                                        style={{
+                                          width: "100px",
+                                          height: "100px",
+                                          objectFit: "cover",
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -1176,27 +1232,50 @@ export default function GateIN() {
                                     {containerType == "Laden" && (
                                       <>
                                         <div className="row">
-                                          <input
-                                            type="text"
-                                            className="form-control w-50"
-                                            placeholder="Liner Seal Number"
-                                          />
-                                          <div className="w-50">
-                                            <label
-                                              htmlFor="LinerSealImage"
-                                              className="btn btn-secondary"
-                                            >
-                                              <i className="ri-camera-line me-2"></i>
-                                              Image
-                                            </label>
+                                          <div className="col-md-12 d-flex gap-4">
                                             <input
-                                              type="file"
-                                              id="LinerSealImage"
-                                              className="d-none "
-                                              name="LinerSealImage"
-                                              accept="image/*"
-                                              capture="environment"
+                                              type="text"
+                                              className="form-control w-50"
+                                              placeholder="Liner Seal Number"
                                             />
+
+                                            <div className="w-50">
+                                              <label
+                                                htmlFor="LinerSealImage"
+                                                className="btn btn-secondary"
+                                              >
+                                                <i className="ri-camera-line me-2"></i>
+                                                Image
+                                                <input
+                                                  type="file"
+                                                  id="LinerSealImage"
+                                                  className="d-none "
+                                                  name="LinerSealImage"
+                                                  accept="image/*"
+                                                  capture="environment"
+                                                  onChange={(e) =>
+                                                    handleImageChange(
+                                                      e,
+                                                      "seal1"
+                                                    )
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                            {Photos?.seal1 && (
+                                              <div className="mt-2">
+                                                <img
+                                                  src={Photos.seal1}
+                                                  alt="seal1"
+                                                  className="img-thumbnail rounded-3"
+                                                  style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                  }}
+                                                />
+                                              </div>
+                                            )}
                                           </div>
                                         </div>
 
@@ -1213,15 +1292,32 @@ export default function GateIN() {
                                             >
                                               <i className="ri-camera-line me-2"></i>
                                               Image
+                                              <input
+                                                type="file"
+                                                id="CustomSealImage"
+                                                name="CustomSealImage"
+                                                className="d-none "
+                                                accept="image/*"
+                                                capture="environment"
+                                                onChange={(e) =>
+                                                  handleImageChange(e, "specialPermit")
+                                                }
+                                              />
                                             </label>
-                                            <input
-                                              type="file"
-                                              id="CustomSealImage"
-                                              name="CustomSealImage"
-                                              className="d-none "
-                                              accept="image/*"
-                                              capture="environment"
-                                            />
+                                            {Photos?.specialPermit && (
+                                              <div className="mt-2">
+                                                <img
+                                                  src={Photos.specialPermit}
+                                                  alt="specialPermit"
+                                                  className="img-thumbnail rounded-3"
+                                                  style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                  }}
+                                                />
+                                              </div>
+                                            )}
                                           </div>
                                         </div>
                                       </>

@@ -1,9 +1,8 @@
-// import React from 'react'
 import Nav from './main/nav';
 import Header from './main/header';
 import Footer from './main/footer';
 import ReactDOM from 'react-dom/client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function Rst() {
     const cards = [];
@@ -37,6 +36,34 @@ function Rst() {
     }
 
 
+    const fileInputRef = useRef(null);
+    const [image, setImage] = useState(null);
+  
+    const openCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" }, // Rear Camera
+        });
+  
+        const video = document.createElement("video");
+        video.srcObject = stream;
+        video.play();
+  
+        setTimeout(() => {
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+          setImage(canvas.toDataURL("image/png")); // Save image
+          stream.getTracks().forEach((track) => track.stop()); // Stop camera
+        }, 3000); // Capture after 3 seconds
+      } catch (error) {
+        console.error("Camera access denied:", error);
+      }
+    };
+
     return (
         <>
             <div class="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
@@ -44,7 +71,27 @@ function Rst() {
                     <Nav />
                     <div className="layout-page">
                         <div className="content-wrapper">
-                            <div className="container-xxl flex-grow-1 container-p-y"><div />
+                            <div className="container-xxl flex-grow-1 container-p-y">
+
+
+
+                            <div>
+      <button onClick={openCamera}>Open Camera</button>
+      <input
+        type="file"
+        id="container_image"
+        name="container_image"
+        className="d-none"
+        accept="image/*"
+        capture="environment"
+        ref={fileInputRef}
+      />
+      {image && <img src={image} alt="Captured" style={{ width: "200px", marginTop: "10px" }} />}
+    </div>
+
+
+
+
                                 <div className="card p-4">
                                     <>
                                         {/* Nav pills */}

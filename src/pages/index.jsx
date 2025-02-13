@@ -236,7 +236,7 @@ export default function Index() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    // alert("yutyu");
+
     const formData = new FormData(e.target);
     let formValues = Object.fromEntries(formData.entries());
 

@@ -1,21 +1,48 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Header from "./main/header";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useSearchParams,
+} from "react-router-dom";
 import Footer from "./main/footer";
 import Nav from "./main/nav";
 import { Html5Qrcode } from "html5-qrcode";
 import Swal from "sweetalert2";
 import "../App.css";
 import axios from "axios";
+import { compressImage, formatToDateTime } from "./main/formatToDateTime";
 
 export default function GateIN() {
-  // const type = "IN";
-  const [type, setType] = useState("IN");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const formRef = useRef(null);
+
   const [showScreen, setShowScreen] = useState("Gate");
+  const [type, setType] = useState("IN");
   const [gate_no, setGateNo] = useState(null);
   const [lane_no, setLineNo] = useState(null);
-  const [permit, setPermit] = useState(false);
+
+  useEffect(() => {
+    // setShowScreen(searchParams.get("showScreen") ?? "Gate");
+    setType(searchParams.get("type") ?? "IN");
+    // setGateNo(searchParams.get("gate_no") ?? null);
+    // setLineNo(searchParams.get("lane_no") ?? null);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (showScreen && type && gate_no && lane_no) GetLIveData();
+  }, [showScreen, type, gate_no, lane_no]);
+
+  const [EditVehicleNo, setEditVehicleNo] = useState(null);
+  const [EditVehicleID, setEditVehicleID] = useState(null);
+  const [EditAbleVehicleNo, setEditAbleVehicleNo] = useState(null);
+
+  const [EditAblePermit, setEditAblePermit] = useState(false);
+  const [PermitData, setPermitData] = useState(null);
+  const [scannedData, setScannedData] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+
   const [isSpecialPermit, setIsSpecialPermit] = useState(false);
   const [specialPermit, setSpecialPermit] = useState(null);
   const [isContainer, setIsContainer] = useState(false);
@@ -30,17 +57,18 @@ export default function GateIN() {
   const [rightSideDamage, setRightSideDamage] = useState(null);
   const [topSideDamage, setTopSideDamage] = useState(null);
 
-  const [scannedData, setScannedData] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
   const [Error, setError] = useState("");
 
   const [Data, setData] = useState([]);
   const [NewVehicle, setNewVehicle] = useState(false);
-  const [loading, setLoading] = useState("false");
+  const [loading, setLoading] = useState(false);
   const [SelectedData, setSelectedData] = useState("");
 
   const [ocr_vehicle_number, setOcr_vehicle_number] = useState("");
   const [vehicle_no_image, setVehicle_no_image] = useState("");
+
+  const [Seal_1_no, setSeal_1_no] = useState("");
+  const [Seal_2_no, setSeal_2_no] = useState("");
 
   let html5QrCode;
   const stopQrScanner = () => {
@@ -77,15 +105,12 @@ export default function GateIN() {
 
           const constraints = environmentCamera
             ? { deviceId: { exact: environmentCamera.deviceId } }
-            : { facingMode: "environment" }; // Use 'environment' to access the rear camera on mobile devices
-
-          // Start QR scanner with constraints
+            : { facingMode: "environment" };
           html5QrCode
             .start(
               constraints,
               { fps: 10, qrbox: { width: 250, height: 250 } },
               (decodedText) => {
-                // Handle scanned data
                 setScannedData(decodedText);
                 setIsScanning(false);
                 html5QrCode.stop();
@@ -93,39 +118,23 @@ export default function GateIN() {
               (errorMessage) => {
                 console.error("ScanningError:", errorMessage);
                 setError("ScanningError:", errorMessage);
-                // Swal.fire({
-                //   icon: "error",
-                //   text: errorMessage,
-                //   timer: 1500,
-                //   customClass: {
-                //     popup: 'custom-swal-popup' // Add a custom class
-                //   }
-                // });
               }
             )
             .catch((err) => {
-              Swal.fire({
-                icon: "error",
-                text: `Error starting QR scanner` + err,
-                timer: 1500,
-                customClass: {
-                  popup: "custom-swal-popup", // Add a custom class
-                },
-              });
               console.error("Error starting QR scanner:", err);
               setError("Error starting QR scanner:", err);
               setIsScanning(false);
             });
         })
         .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            text: `Error starting QR scanner` + err,
-            timer: 1500,
-            customClass: {
-              popup: "custom-swal-popup", // Add a custom class
-            },
-          });
+          // Swal.fire({
+          //   icon: "error",
+          //   text: `Error starting QR scanner` + err,
+          //   timer: 1500,
+          //   customClass: {
+          //     popup: "custom-swal-popup", // Add a custom className
+          //   },
+          // });
           console.error("Error enumerating devices:", err);
           setError("Error enumerating devices: ", err);
 
@@ -151,25 +160,17 @@ export default function GateIN() {
               },
               (errorMessage) => {
                 console.error("ScanningError:", errorMessage);
-                // Swal.fire({
-                //   icon: "error",
-                //   text: errorMessage,
-                //   timer: 1500,
-                //   customClass: {
-                //     popup: 'custom-swal-popup' // Add a custom class
-                //   }
-                // });
               }
             )
             .catch((err) => {
-              Swal.fire({
-                icon: "error",
-                text: `Error starting QR scanner` + err,
-                timer: 1500,
-                customClass: {
-                  popup: "custom-swal-popup", // Add a custom class
-                },
-              });
+              // Swal.fire({
+              //   icon: "error",
+              //   text: `Error starting QR scanner` + err,
+              //   timer: 1500,
+              //   customClass: {
+              //     popup: "custom-swal-popup", // Add a custom className
+              //   },
+              // });
               console.error("Error starting QR scanner:", err);
 
               setError("Error starting QR scanner: ", err);
@@ -177,14 +178,14 @@ export default function GateIN() {
             });
         })
         .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            text: `Error accessing the camera` + err,
-            timer: 1500,
-            customClass: {
-              popup: "custom-swal-popup", // Add a custom class
-            },
-          });
+          // Swal.fire({
+          //   icon: "error",
+          //   text: `Error accessing the camera` + err,
+          //   timer: 1500,
+          //   customClass: {
+          //     popup: "custom-swal-popup", // Add a custom className
+          //   },
+          // });
           console.error("Error accessing the camera:", err);
           setError("Error accessing the camera: ", err);
 
@@ -196,7 +197,7 @@ export default function GateIN() {
         text: `Media devices are not supported on this device.`,
         timer: 1500,
         customClass: {
-          popup: "custom-swal-popup", // Add a custom class
+          popup: "custom-swal-popup", // Add a custom className
         },
       });
       console.error("Media devices are not supported on this device.");
@@ -207,49 +208,86 @@ export default function GateIN() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    // alert("Submit");
-    // console.log(e);
+
+    setLoading(true);
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
     const formData = new FormData(e.target);
+
     formData.append("ocr_vehicle_number", ocr_vehicle_number); // Append the vehicle number
     formData.append("vehicle_no_image", vehicle_no_image);
 
-    const formEntries = Object.fromEntries(formData.entries());
-    const user = JSON.parse(localStorage.getItem("user"));
+    let formEntries = Object.fromEntries(formData.entries());
 
-    formEntries.id = SelectedData.id;
+    const FIles = [
+      "vehicle_no_image",
+      "driver_photo",
+      "driver_license",
+      "e_bill",
+      "custom_documents",
+      "special_permit",
+      "seal_1_image",
+      "seal_2_image",
+      "empty_container_image_1",
+      "empty_container_image_2",
+    ];
+
+    const targetSize = 20 * 1024; // 50KB
+
+    for (let index = 0; index < FIles.length; index++) {
+      const element = FIles[index];
+      if (element) {
+        const file = formData.get(element);
+        if (file && file.name) {
+          const compressedFile = await compressImage(file, targetSize);
+          if (compressedFile) {
+            formData.set(element, compressedFile);
+            formEntries = Object.fromEntries(formData.entries());
+          } else {
+            alert("Could not compress this file.");
+            return;
+          }
+        }
+      }
+    }
+
+    // formEntries.id = SelectedData.id;
     formEntries.type = type;
     formEntries.gate_no = gate_no;
     formEntries.lane_no = lane_no;
     formEntries.gate_name = "EXIM";
     formEntries.created_by = user.id;
+    formEntries.vehicle_no_id = SelectedData.id;
+    formEntries.vehicle_no = SelectedData.vehicle_no;
 
     console.log(formEntries);
 
-    setLoading(true);
     const url = `https://ctas.live/backend/api/gate/surveyData/post`;
-    // const url = `http://127.0.0.1:8000/api/gate/surveyData/post`;
 
     try {
       const response = await axios.post(url, formEntries, {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "multipart/form-data" },
       });
+      console.log(response.data);
       if (response.data.status && response.data.status == "success") {
-        // setData(response.data.data);
-        // alert(response.data.message)
         Swal.fire({
           icon: "success",
           text: response.data.message,
           timer: 3000,
           showConfirmButton: false,
         }).then(() => {
-          window.location = "?";
+          formRef?.current?.reset();
+          window.location.reload();
+          setShowScreen("Vehicles");
+          GetLIveData();
         });
       } else {
         Swal.fire({
           icon: "info",
-          text: `Please Check all Field .... Something Want Wrong..!`,
-          timer: 3000,
-          showConfirmButton: false,
+          text: `Please Check all Field .... ${response.data.message}`,
+          // timer: 3000,
+          // showConfirmButton: false,
         });
       }
     } catch (error) {
@@ -266,7 +304,7 @@ export default function GateIN() {
 
   const GetLIveData = async () => {
     setLoading(true);
-    const url = `https://ctas.live/backend/api/gate/live/transactions?type=${type}&lane_no=${lane_no}&gate_name=EXIM`;
+    const url = `https://ctas.live/backend/api/gate/new/vehicles?type=${type}&lane_no=${lane_no}&gate_name=EXIM`;
     try {
       const response = await axios.get(url, {
         headers: { "Content-Type": "application/json" },
@@ -318,57 +356,219 @@ export default function GateIN() {
     }
   };
 
+  const handlePermitNo = async () => {
+    setLoading(true);
+    if (scannedData && type) {
+      const url = `https://ctas.live/backend/api/get/permit_detail_v2/${scannedData}?gate_name=EXIM&type=${type}&gate_no=${gate_no}&lane_no=${lane_no}`;
+
+      try {
+        const response = await axios.get(url, {
+          headers: { "Content-Type": "application/json" },
+        });
+        console.log(response.data);
+        if (response.data.data) {
+          setPermitData(response.data.data);
+        } else {
+          Swal.fire({
+            icon: "info",
+            text: `Something Want Wrong..! ${response.data.message}`,
+            // timer: 3000,
+            // showConfirmButton: false,
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          text: `Error in Data Fetch: ${error.message}`,
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+      Swal.fire({
+        icon: "info",
+        text: `Please Check all Field .... Something Want Wrong..!`,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    }
+  };
+
+  const handleEditVehicleNo = async () => {
+    setLoading(true);
+    if (EditVehicleID && EditVehicleNo) {
+      const payload = {
+        id: EditVehicleID,
+        vehicle_no: EditVehicleNo,
+      };
+      const url = `https://ctas.live/backend/api/gate/ocr/vehicle/update`;
+
+      try {
+        const response = await axios.post(url, payload, {
+          headers: { "Content-Type": "application/json" },
+        });
+        if (response.data.status && response.data.status == "success") {
+          Swal.fire({
+            icon: "success",
+            text: response.data.message,
+            timer: 3000,
+            showConfirmButton: false,
+          }).then(() => {
+            setEditVehicleID(null);
+            setEditVehicleNo(null);
+            setEditAbleVehicleNo(false);
+            setEditAblePermit(true);
+          });
+        } else {
+          Swal.fire({
+            icon: "info",
+            text: `Something Want Wrong..!`,
+            timer: 3000,
+            showConfirmButton: false,
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          text: `Error in Data Fetch: ${error.message}`,
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+      Swal.fire({
+        icon: "info",
+        text: `Please Check all Field .... Something Want Wrong..!`,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    }
+  };
+
+  const handleImageToText = async (e, seal) => {
+    e.preventDefault();
+    setLoading(true);
+    const file = e.target.files[0];
+    if (!file) return;
+
+
+    const formData = new FormData();
+    const targetSize = 20 * 1024; // 50KB
+
+        if (file && file.name) {
+          const compressedFile = await compressImage(file, targetSize);
+          if (compressedFile) {
+            formData.set("image", compressedFile);
+            // formData.set(element, compressedFile);
+            // formEntries = Object.fromEntries(formData.entries());
+          } else {
+            alert("Could not compress this file.");
+            return;
+          }
+        }
+        
+
+    const url = `https://ctas.live/backend/api/text/extract/vision`;
+
+    try {
+      const response = await axios.post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log(response.data);
+      if (response.data.status && response.data.status == "success") {
+        if (seal == 1) {
+          setSeal_1_no(response.data.data[0]);
+        }
+        if (seal == 2) {
+          setSeal_2_no(response.data.data[0]);
+        }
+      } else {
+        Swal.fire({
+          icon: "info",
+          text: `Please Try ...`,
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        text: `Error in Data Fetch: ${error.message}`,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
-      <div class="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
-        <div class="layout-container">
+      {loading && (
+        <div
+          className="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+          style={{ zIndex: 9999 }}
+        >
+          <div className="sk-chase sk-primary display-1">
+            <div className="sk-chase-dot" />
+            <div className="sk-chase-dot" />
+            <div className="sk-chase-dot" />
+            <div className="sk-chase-dot" />
+            <div className="sk-chase-dot" />
+            <div className="sk-chase-dot" />
+          </div>
+        </div>
+      )}
+      <div className="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
+        <div
+          className="layout-container"
+          style={{
+            backgroundImage: "url('/background.webp')",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.9,
+          }}
+        >
           <Nav />
 
-          <div className="layout-page">
-            <div
-              className="content-wrapper"
-              style={{
-                backgroundImage: "url('/background.webp')",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                opacity: 0.9,
-              }}
-            >
-              <div
-                className="container-xxl flex-grow-1 container-p-y "
-                style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-              >
-                <form
-                  className="row align-items-center justify-content-center "
-                  onSubmit={handleFormSubmit}
-                >
-                  <div className="col-md-5 col-sm-7  ">
+          <div
+            className="layout-page"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+          >
+            <div className="content-wrapper">
+              <div className="container-xxl flex-grow-1 container-p-y ">
+                <div className="row align-items-center justify-content-center ">
+                  <div className="col-lg-6 col-md-9 col-sm-12  ">
                     {showScreen && showScreen == "Gate" ? (
                       <>
-                        <div className="ms-auto col-md-12 text-center">
-                          <a
-                            href="#"
+                        <div className="ms-auto col-md-12 text-center mb-3">
+                          <button
                             className={
                               type == "IN"
-                                ? "btn btn-info m-2"
-                                : "btn btn-outline-info m-2"
+                                ? "btn me-2 btn-info"
+                                : "btn me-2 btn-outline-info"
                             }
                             onClick={() => setType("IN")}
                           >
                             In Gate
-                          </a>
-                          <a
-                            href="#"
+                          </button>
+                          <button
                             className={
                               type == "IN"
-                                ? "btn btn-outline-info"
-                                : "btn btn-info"
+                                ? "btn me-2 btn-outline-info"
+                                : "btn me-2 btn-info"
                             }
                             onClick={() => setType("OUT")}
                           >
                             Out Gate
-                          </a>
+                          </button>
                         </div>
                         <div className="card bg-none">
                           <div className="card-body border-bottom py-2 px-1">
@@ -558,13 +758,13 @@ export default function GateIN() {
                                     >
                                       <label
                                         className="form-check-label custom-option-content text-center p-3"
-                                        htmlFor="gate_no2"
+                                        htmlFor="gate_no1"
                                       >
                                         <input
                                           name="gate_no"
                                           className="form-check-input"
                                           type="radio"
-                                          id="gate_no2"
+                                          id="gate_no1"
                                           hidden
                                           onChange={() => {
                                             setGateNo("1");
@@ -693,6 +893,14 @@ export default function GateIN() {
                                   disabled={!gate_no}
                                   onClick={() => {
                                     setShowScreen("Vehicles");
+
+                                    searchParams.set("type", type);
+                                    // searchParams.set("gate_no", gate_no);
+                                    // searchParams.set("lane_no", lane_no);
+                                    // searchParams.set("showScreen", "Vehicles");
+
+                                    setSearchParams(searchParams);
+
                                     GetLIveData();
                                   }}
                                 >
@@ -705,18 +913,19 @@ export default function GateIN() {
                       </>
                     ) : showScreen == "Vehicles" ? (
                       <div className="card">
-                        <div className="card-body border-bottom row">
-                          <div className="col-md-6">
-                            <h4 className="m-0">Vehicles</h4>
-                          </div>
-                          <div className="col-md-6 text-end">
-                            <a
-                              href="#"
-                              className="btn btn-info btn-sm"
-                              onClick={() => setNewVehicle(true)}
-                            >
-                              Add New Vehicle
-                            </a>
+                        <div className="card-body border-bottom">
+                          <div className="row">
+                            <div className="col-md-6">
+                              <h4 className="m-0">Vehicles</h4>
+                            </div>
+                            <div className="col-md-6 text-end">
+                              <button
+                                className="btn btn-info btn-sm"
+                                onClick={() => setNewVehicle(true)}
+                              >
+                                Add New Vehicle
+                              </button>
+                            </div>
                           </div>
                         </div>
                         <div className="card-body border-bottom">
@@ -734,7 +943,7 @@ export default function GateIN() {
                                   placeholder="Vehicle No"
                                 />
                                 <hr />
-                                <label htmlFor="">Caputre Image</label>
+                                <label htmlFor="">Capture Image</label>
                                 <input
                                   type="file"
                                   className="form-control"
@@ -751,7 +960,10 @@ export default function GateIN() {
                                   className="btn btn-success m-0  w-100"
                                   onClick={() => {
                                     setShowScreen("Permit");
-                                    setSelectedData({ id: 0 });
+                                    setSelectedData({
+                                      id: 0,
+                                      vehicle_no: ocr_vehicle_number,
+                                    });
                                   }}
                                 >
                                   Start Survey
@@ -762,28 +974,58 @@ export default function GateIN() {
                             )}
                             {Data &&
                               Data.map((row, i) => (
-                                <div className="col-md-6">
+                                <div className="col-md-6" key={i}>
                                   <div className="card">
                                     <img
                                       src={
                                         "https://ctas.live/ocr_backend/uploads/" +
-                                        row.vehicle_no_image
+                                        row.vehicle_no_img
                                       }
                                       className="card-img-top"
                                       alt="..."
-                                      style={{ height: "200px" }}
+                                      // style={{ height: "200px" }}
                                     />
                                     <div className="card-body">
-                                      <div className="d-flex justify-content-between align-items-center">
+                                      <div className="d-flex justify-content-between align-items-center gap-1 mb-1">
                                         <h5 className="card-title">
-                                          {row.ocr_vehicle_no}{" "}
+                                          {EditAbleVehicleNo &&
+                                          row.id === EditVehicleID ? (
+                                            <input
+                                              type="text"
+                                              className="form-control p-1"
+                                              defaultValue={row.vehicle_no}
+                                              onChange={(e) =>
+                                                setEditVehicleNo(e.target.value)
+                                              }
+                                              name="vehicle_no"
+                                              id="vehicle_no"
+                                            />
+                                          ) : (
+                                            row.vehicle_no
+                                          )}
                                         </h5>
-                                        <button
-                                          type="button"
-                                          className="btn btn-sm btn-label-primary"
-                                        >
-                                          <i class="ri-edit-circle-fill"></i>
-                                        </button>
+
+                                        {EditAbleVehicleNo &&
+                                        row.id === EditVehicleID ? (
+                                          <button
+                                            type="button"
+                                            className="btn btn-sm btn-label-primary"
+                                            onClick={handleEditVehicleNo}
+                                          >
+                                            <i className="ri-verified-badge-line"></i>
+                                          </button>
+                                        ) : (
+                                          <button
+                                            type="button"
+                                            className="btn btn-sm btn-label-primary"
+                                            onClick={() => {
+                                              setEditVehicleID(row.id);
+                                              setEditAbleVehicleNo(true);
+                                            }}
+                                          >
+                                            <i className="ri-edit-circle-fill"></i>
+                                          </button>
+                                        )}
                                       </div>
                                       <button
                                         type="button"
@@ -799,24 +1041,6 @@ export default function GateIN() {
                                   </div>
                                 </div>
                               ))}
-
-                            {/* <div className="col-md-6">
-                              <div className="card">
-                                <img
-                                  src="https://5.imimg.com/data5/SELLER/Default/2023/3/294563822/GR/YN/WP/2617956/14inch-3mm-vehicle-number-plate.jpg"
-                                  className="card-img-top"
-                                  alt="..."
-                                />
-                                <div className="card-body">
-                                  <h5 className="card-title">TN88F4089</h5>
-                                  <button type="button"
-                                    className="btn btn-sm btn-label-primary"
-                                    onClick={() => setShowScreen("Permit")} >
-                                    Start Survey
-                                  </button>
-                                </div>
-                              </div>
-                            </div> */}
                           </div>
                         </div>
                         <div className="row">
@@ -834,9 +1058,16 @@ export default function GateIN() {
                         </div>
                       </div>
                     ) : (
-                      <div className="card">
+                      <form
+                        className="card"
+                        ref={formRef}
+                        onSubmit={handleFormSubmit}
+                      >
                         <div className="card-body border-bottom">
-                          <h5 className="m-0">Driver Information</h5>
+                          <div className="d-flex align-items-center justify-content-between">
+                            <h5 className="m-0">Driver Information</h5>
+                            <b>{SelectedData.vehicle_no}</b>
+                          </div>
                           <hr className="my-2" />
                           <div className="row align-items-center justify-contact-between">
                             <div className="col-4">
@@ -844,8 +1075,8 @@ export default function GateIN() {
                                 htmlFor="DriverPhoto"
                                 className="btn btn-secondary btn-sm"
                               >
-                                <i className="ri-camera-line me-1"></i> Driver
-                                Photo
+                                <i className="ri-camera-line me-1"></i>{" "}
+                                Driver&nbsp;Photo
                                 <input
                                   type="file"
                                   id="DriverPhoto"
@@ -878,8 +1109,8 @@ export default function GateIN() {
                                 htmlFor="DriverLicense"
                                 className="btn btn-secondary btn-sm"
                               >
-                                <i className="ri-camera-line me-1"></i> Driver
-                                License
+                                <i className="ri-camera-line me-1"></i>{" "}
+                                Driver&nbsp;License
                                 <input
                                   type="file"
                                   id="DriverLicense"
@@ -913,7 +1144,8 @@ export default function GateIN() {
                                   htmlFor="e_bill"
                                   className="btn btn-secondary btn-sm"
                                 >
-                                  <i className="ri-camera-line me-1"></i> E Bill
+                                  <i className="ri-camera-line me-1"></i>{" "}
+                                  E&nbsp;Bill
                                   <input
                                     type="file"
                                     id="e_bill"
@@ -949,7 +1181,7 @@ export default function GateIN() {
                                     className="btn btn-secondary btn-sm"
                                   >
                                     <i className="ri-camera-line me-1"></i>{" "}
-                                    Custom Documents
+                                    Custom&nbsp;Documents
                                     <input
                                       type="file"
                                       id="custom_documents"
@@ -990,13 +1222,20 @@ export default function GateIN() {
                                   <input
                                     type="text"
                                     className="form-control p-2 fs-6 mb-2"
-                                    placeholder="e.g. PMA2007040012"
+                                    placeholder="PMA2007040012"
                                     name="permit_no"
-                                    // onKeyUp={(e)=>setPermit(e.target.value)}
+                                    readOnly={EditAblePermit}
                                     defaultValue={scannedData}
+                                    onChange={(e) =>
+                                      setScannedData(e.target.value)
+                                    }
                                   />
-                                  <span className="mt-2">
-                                    Today , 12 jan 2025
+                                  <span className="mt-2 text-primary fw-bold">
+                                    {PermitData?.PermitDateTime
+                                      ? formatToDateTime(
+                                          PermitData?.PermitDateTime
+                                        )
+                                      : ""}
                                   </span>
                                 </div>
                                 <button
@@ -1008,13 +1247,21 @@ export default function GateIN() {
                                 >
                                   <i className="ri-camera-line fs-4"></i>
                                 </button>
+
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-label-primary"
+                                  onClick={handlePermitNo}
+                                >
+                                  <i className="ri-verified-badge-line fs-4"></i>
+                                </button>
                               </div>
                             </div>
 
                             <div className="col-12 mb-1">
-                              <div class="form-check align-items-center">
+                              <div className="form-check align-items-center">
                                 <input
-                                  class="form-check-input rounded-circle fs-6 me-2"
+                                  className="form-check-input rounded-circle fs-6 me-2"
                                   type="checkbox"
                                   id="flexCheck"
                                   onChange={() =>
@@ -1022,7 +1269,7 @@ export default function GateIN() {
                                   }
                                 />
                                 <label
-                                  class="form-check-label fs-6"
+                                  className="form-check-label fs-6"
                                   htmlFor="flexCheck"
                                 >
                                   Special Permit
@@ -1067,20 +1314,20 @@ export default function GateIN() {
                             </div>
                             <hr />
                             <div className="col-md-12">
-                              <div class="form-check align-items-center">
+                              <div className="form-check align-items-center">
                                 <input
-                                  class="form-check-input rounded-circle fs-6 me-2"
+                                  className="form-check-input rounded-circle fs-6 me-2"
                                   type="checkbox"
                                   id="isContainer"
                                   name="is_container"
-                                  value="YES"
+                                  value="Y"
                                   onChange={() => setIsContainer(!isContainer)}
                                 />
                                 <label
-                                  class="form-check-label h5 mb-0"
+                                  className="form-check-label h5 mb-0"
                                   htmlFor="isContainer"
                                 >
-                                  Is Container
+                                  Container
                                 </label>
                               </div>
                               {isContainer && (
@@ -1152,6 +1399,29 @@ export default function GateIN() {
                                         </label>
                                       </div>
                                     </div>
+                                  </div>
+                                  <div className="row">
+                                    {Array.from({ length: container }).map(
+                                      (_, index) => (
+                                        <div className="col-md-8 my-1">
+                                          <label htmlFor="">
+                                            Container Number
+                                          </label>
+                                          <input
+                                            key={index}
+                                            type="text"
+                                            className="form-control"
+                                            name={`container_no_${index + 1}`}
+                                            defaultValue={
+                                              index === 0
+                                                ? PermitData?.ContainerNumber
+                                                : ""
+                                            }
+                                            placeholder="Container Number"
+                                          />
+                                        </div>
+                                      )
+                                    )}
                                   </div>
                                   <div className="row">
                                     <h5 className="mt-3 mb-1">
@@ -1232,33 +1502,36 @@ export default function GateIN() {
                                     {containerType == "Laden" && (
                                       <>
                                         <div className="row">
-                                          <div className="col-md-12 d-flex gap-4">
+                                          <div className="col-md-12 d-flex gap-4 align-items-center">
                                             <input
                                               type="text"
                                               className="form-control w-50"
+                                              defaultValue={Seal_1_no}
+                                              name="seal_1_no"
                                               placeholder="Liner Seal Number"
                                             />
 
                                             <div className="w-50">
                                               <label
-                                                htmlFor="LinerSealImage"
+                                                htmlFor="seal_1_image"
                                                 className="btn btn-secondary"
                                               >
                                                 <i className="ri-camera-line me-2"></i>
                                                 Image
                                                 <input
                                                   type="file"
-                                                  id="LinerSealImage"
+                                                  id="seal_1_image"
                                                   className="d-none "
-                                                  name="LinerSealImage"
+                                                  name="seal_1_image"
                                                   accept="image/*"
                                                   capture="environment"
-                                                  onChange={(e) =>
+                                                  onChange={(e) => {
+                                                    handleImageToText(e, 1);
                                                     handleImageChange(
                                                       e,
                                                       "seal1"
-                                                    )
-                                                  }
+                                                    );
+                                                  }}
                                                 />
                                               </label>
                                             </div>
@@ -1280,44 +1553,53 @@ export default function GateIN() {
                                         </div>
 
                                         <div className="row mt-2">
-                                          <input
-                                            type="text"
-                                            className="form-control w-50"
-                                            placeholder="Custom Seal Number"
-                                          />
-                                          <div className="w-50">
-                                            <label
-                                              htmlFor="CustomSealImage"
-                                              className="btn btn-secondary"
-                                            >
-                                              <i className="ri-camera-line me-2"></i>
-                                              Image
-                                              <input
-                                                type="file"
-                                                id="CustomSealImage"
-                                                name="CustomSealImage"
-                                                className="d-none "
-                                                accept="image/*"
-                                                capture="environment"
-                                                onChange={(e) =>
-                                                  handleImageChange(e, "specialPermit")
-                                                }
-                                              />
-                                            </label>
-                                            {Photos?.specialPermit && (
-                                              <div className="mt-2">
-                                                <img
-                                                  src={Photos.specialPermit}
-                                                  alt="specialPermit"
-                                                  className="img-thumbnail rounded-3"
-                                                  style={{
-                                                    width: "100px",
-                                                    height: "100px",
-                                                    objectFit: "cover",
+                                          <div className="col-md-12 d-flex gap-4  align-items-center">
+
+                                            <input
+                                              type="text"
+                                              className="form-control w-50"
+                                                defaultValue={Seal_2_no}
+                                              name="seal_2_no"
+                                              placeholder="Custom Seal Number"
+                                            />
+                                            <div className="w-50">
+                                              <label
+                                                htmlFor="seal_2_image"
+                                                className="btn btn-secondary"
+                                              >
+                                                <i className="ri-camera-line me-2"></i>
+                                                Image
+                                                <input
+                                                  type="file"
+                                                  id="seal_2_image"
+                                                  name="seal_2_image"
+                                                  className="d-none "
+                                                  accept="image/*"
+                                                  capture="environment"
+                                                  onChange={(e) => {
+                                                    handleImageToText(e, 2);
+                                                    handleImageChange(
+                                                      e,
+                                                      "seal2"
+                                                    );
                                                   }}
                                                 />
+                                              </label>
                                               </div>
-                                            )}
+                                              {Photos?.seal2 && (
+                                                <div className="mt-2">
+                                                  <img
+                                                    src={Photos.seal2}
+                                                    alt="CustomSealImage"
+                                                    className="img-thumbnail rounded-3"
+                                                    style={{
+                                                      width: "100px",
+                                                      height: "100px",
+                                                      objectFit: "cover",
+                                                    }}
+                                                  />
+                                                </div>
+                                              )}
                                           </div>
                                         </div>
                                       </>
@@ -1331,15 +1613,37 @@ export default function GateIN() {
                                           >
                                             <i className="ri-camera-line me-2"></i>
                                             Add Photo
+                                            <input
+                                              type="file"
+                                              id="containerImage1"
+                                              name="empty_container_image_1"
+                                              className="d-none"
+                                              accept="image/*"
+                                              capture="environment"
+                                              onChange={(e) =>
+                                                handleImageChange(
+                                                  e,
+                                                  "empty_container_image_1"
+                                                )
+                                              }
+                                            />
                                           </label>
-                                          <input
-                                            type="file"
-                                            id="containerImage1"
-                                            name="1_empty_contianer_image"
-                                            className="d-none"
-                                            accept="image/*"
-                                            capture="environment"
-                                          />
+                                          {Photos?.empty_container_image_1 && (
+                                            <div className="mt-2">
+                                              <img
+                                                src={
+                                                  Photos.empty_container_image_1
+                                                }
+                                                alt="empty_container_image_1"
+                                                className="img-thumbnail rounded-3"
+                                                style={{
+                                                  width: "100px",
+                                                  height: "100px",
+                                                  objectFit: "cover",
+                                                }}
+                                              />
+                                            </div>
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="d-flex gap-5 align-items-center">
@@ -1350,15 +1654,37 @@ export default function GateIN() {
                                             >
                                               <i className="ri-camera-line me-2"></i>
                                               Add Photo
+                                              <input
+                                                type="file"
+                                                id="containerImage1"
+                                                className="d-none"
+                                                name="empty_container_image_1"
+                                                accept="image/*"
+                                                capture="environment"
+                                                onChange={(e) =>
+                                                  handleImageChange(
+                                                    e,
+                                                    "empty_container_image_1"
+                                                  )
+                                                }
+                                              />
                                             </label>
-                                            <input
-                                              type="file"
-                                              id="containerImage1"
-                                              className="d-none"
-                                              name="1_empty_contianer_image"
-                                              accept="image/*"
-                                              capture="environment"
-                                            />
+                                            {Photos?.empty_container_image_1 && (
+                                              <div className="mt-2">
+                                                <img
+                                                  src={
+                                                    Photos.empty_container_image_1
+                                                  }
+                                                  alt="empty_container_image_1"
+                                                  className="img-thumbnail rounded-3"
+                                                  style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                  }}
+                                                />
+                                              </div>
+                                            )}
                                           </div>
                                           <div>
                                             <label
@@ -1367,29 +1693,50 @@ export default function GateIN() {
                                             >
                                               <i className="ri-camera-line me-2"></i>
                                               Add Photo
+                                              <input
+                                                type="file"
+                                                id="containerImage2"
+                                                name="empty_container_image_2"
+                                                className="d-none"
+                                                accept="image/*"
+                                                capture="environment"
+                                                onChange={(e) =>
+                                                  handleImageChange(
+                                                    e,
+                                                    "empty_container_image_2"
+                                                  )
+                                                }
+                                              />
                                             </label>
-                                            <input
-                                              type="file"
-                                              id="containerImage2"
-                                              name="2_empty_contianer_image"
-                                              className="d-none"
-                                              accept="image/*"
-                                              capture="environment"
-                                            />
+                                            {Photos?.empty_container_image_2 && (
+                                              <div className="mt-2">
+                                                <img
+                                                  src={
+                                                    Photos.empty_container_image_2
+                                                  }
+                                                  alt="empty_container_image_2"
+                                                  className="img-thumbnail rounded-3"
+                                                  style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                  }}
+                                                />
+                                              </div>
+                                            )}
                                           </div>
                                         </div>
                                       ))}
                                   </div>
                                   <hr />
                                   <div className="row my-3">
-                                    {/* <h5 className="mb-0">Container Health</h5> */}
-                                    <div class="form-check align-items-center">
+                                    <div className="form-check align-items-center">
                                       <input
-                                        class="form-check-input rounded-circle fs-6 me-2"
+                                        className="form-check-input rounded-circle fs-6 me-2"
                                         type="checkbox"
                                         id="isContainerDamage"
                                         name="is_container_damgage"
-                                        value="YES"
+                                        value="Y"
                                         onChange={() =>
                                           setIsContainerDamage(
                                             !isContainerDamage
@@ -1397,10 +1744,10 @@ export default function GateIN() {
                                         }
                                       />
                                       <label
-                                        class="form-check-label h5 mb-0"
+                                        className="form-check-label h5 mb-0"
                                         htmlFor="isContainerDamage"
                                       >
-                                        Is Container Damange
+                                        Container Damage
                                       </label>
                                     </div>
                                     {isContainerDamage && (
@@ -1413,7 +1760,7 @@ export default function GateIN() {
                                             <div className="col-3">
                                               <div
                                                 className={`form-check custom-option custom-option-label custom-option-basic ${
-                                                  rearSideDamage == "YES"
+                                                  rearSideDamage == "Y"
                                                     ? "checked"
                                                     : ""
                                                 } `}
@@ -1426,21 +1773,21 @@ export default function GateIN() {
                                                     name="rearSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="YES"
+                                                    value="Y"
                                                     id="rearSideDamageYes"
                                                     hidden
                                                     onChange={() => {
-                                                      setRearSideDamage("YES");
+                                                      setRearSideDamage("Y");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      rearSideDamage == "YES"
+                                                      rearSideDamage == "Y"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    YES
+                                                    Y
                                                   </b>
                                                 </label>
                                               </div>
@@ -1462,20 +1809,20 @@ export default function GateIN() {
                                                     className="form-check-input"
                                                     type="radio"
                                                     id="rearSideDamageNo"
-                                                    value="NO"
+                                                    value="N"
                                                     hidden
                                                     onChange={() => {
-                                                      setRearSideDamage("NO");
+                                                      setRearSideDamage("N");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      rearSideDamage == "NO"
+                                                      rearSideDamage == "N"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    NO
+                                                    N
                                                   </b>
                                                 </label>
                                               </div>
@@ -1490,7 +1837,7 @@ export default function GateIN() {
                                             <div className="col-3">
                                               <div
                                                 className={`form-check custom-option custom-option-label custom-option-basic ${
-                                                  leftSideDamage == "YES"
+                                                  leftSideDamage == "Y"
                                                     ? "checked"
                                                     : ""
                                                 } `}
@@ -1503,21 +1850,21 @@ export default function GateIN() {
                                                     name="leftSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="YES"
+                                                    value="Y"
                                                     id="leftSideDamageYes"
                                                     hidden
                                                     onChange={() => {
-                                                      setLeftSideDamage("YES");
+                                                      setLeftSideDamage("Y");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      leftSideDamage == "YES"
+                                                      leftSideDamage == "Y"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    YES
+                                                    Y
                                                   </b>
                                                 </label>
                                               </div>
@@ -1539,20 +1886,20 @@ export default function GateIN() {
                                                     className="form-check-input"
                                                     type="radio"
                                                     id="leftSideDamageNo"
-                                                    value="NO"
+                                                    value="N"
                                                     hidden
                                                     onChange={() => {
-                                                      setLeftSideDamage("NO");
+                                                      setLeftSideDamage("N");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      leftSideDamage == "NO"
+                                                      leftSideDamage == "N"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    NO
+                                                    N
                                                   </b>
                                                 </label>
                                               </div>
@@ -1567,7 +1914,7 @@ export default function GateIN() {
                                             <div className="col-3">
                                               <div
                                                 className={`form-check custom-option custom-option-label custom-option-basic ${
-                                                  frontSideDamage == "YES"
+                                                  frontSideDamage == "Y"
                                                     ? "checked"
                                                     : ""
                                                 } `}
@@ -1580,21 +1927,21 @@ export default function GateIN() {
                                                     name="frontSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="YES"
+                                                    value="Y"
                                                     id="frontSideDamageYes"
                                                     hidden
                                                     onChange={() => {
-                                                      setFrontSideDamage("YES");
+                                                      setFrontSideDamage("Y");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      frontSideDamage == "YES"
+                                                      frontSideDamage == "Y"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    YES
+                                                    Y
                                                   </b>
                                                 </label>
                                               </div>
@@ -1615,21 +1962,21 @@ export default function GateIN() {
                                                     name="frontSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="NO"
+                                                    value="N"
                                                     id="frontSideDamageNo"
                                                     hidden
                                                     onChange={() => {
-                                                      setFrontSideDamage("NO");
+                                                      setFrontSideDamage("N");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      frontSideDamage == "NO"
+                                                      frontSideDamage == "N"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    NO
+                                                    N
                                                   </b>
                                                 </label>
                                               </div>
@@ -1644,7 +1991,7 @@ export default function GateIN() {
                                             <div className="col-3">
                                               <div
                                                 className={`form-check custom-option custom-option-label custom-option-basic ${
-                                                  rightSideDamage == "YES"
+                                                  rightSideDamage == "Y"
                                                     ? "checked"
                                                     : ""
                                                 } `}
@@ -1657,21 +2004,21 @@ export default function GateIN() {
                                                     name="rightSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="YES"
+                                                    value="Y"
                                                     id="rightSideDamageYes"
                                                     hidden
                                                     onChange={() => {
-                                                      setRightSideDamage("YES");
+                                                      setRightSideDamage("Y");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      rightSideDamage == "YES"
+                                                      rightSideDamage == "Y"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    YES
+                                                    Y
                                                   </b>
                                                 </label>
                                               </div>
@@ -1692,21 +2039,21 @@ export default function GateIN() {
                                                     name="rightSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="NO"
+                                                    value="N"
                                                     id="rightSideDamageNo"
                                                     hidden
                                                     onChange={() => {
-                                                      setRightSideDamage("NO");
+                                                      setRightSideDamage("N");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      rightSideDamage == "NO"
+                                                      rightSideDamage == "N"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    NO
+                                                    N
                                                   </b>
                                                 </label>
                                               </div>
@@ -1721,7 +2068,7 @@ export default function GateIN() {
                                             <div className="col-3">
                                               <div
                                                 className={`form-check custom-option custom-option-label custom-option-basic ${
-                                                  topSideDamage == "YES"
+                                                  topSideDamage == "Y"
                                                     ? "checked"
                                                     : ""
                                                 } `}
@@ -1734,21 +2081,21 @@ export default function GateIN() {
                                                     name="topSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="YES"
+                                                    value="Y"
                                                     id="topSideDamageYes"
                                                     hidden
                                                     onChange={() => {
-                                                      setTopSideDamage("YES");
+                                                      setTopSideDamage("Y");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      topSideDamage == "YES"
+                                                      topSideDamage == "Y"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    YES
+                                                    Y
                                                   </b>
                                                 </label>
                                               </div>
@@ -1769,21 +2116,21 @@ export default function GateIN() {
                                                     name="topSideDamage"
                                                     className="form-check-input"
                                                     type="radio"
-                                                    value="NO"
+                                                    value="N"
                                                     id="topSideDamageNo"
                                                     hidden
                                                     onChange={() => {
-                                                      setTopSideDamage("NO");
+                                                      setTopSideDamage("N");
                                                     }}
                                                   />
                                                   <b
                                                     className={`fs-6  ${
-                                                      topSideDamage == "NO"
+                                                      topSideDamage == "N"
                                                         ? "text-primary"
                                                         : ""
                                                     } `}
                                                   >
-                                                    NO
+                                                    N
                                                   </b>
                                                 </label>
                                               </div>
@@ -1812,33 +2159,44 @@ export default function GateIN() {
                           <div className="col-6 ps-0 ">
                             <div className="card-body p-0 py-1 text-center bg-label-primary ">
                               <button type="submit" className="btn m-0  w-100">
-                                Sumbit Survey
+                                Submit Survey
                               </button>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </form>
                     )}
                   </div>
-                </form>
-                {showScreen == "Vehicles" ? (
-                  <a
+                </div>
+                {showScreen !== "Gate" ? (
+                  <button
                     onClick={(e) => {
-                      if (
-                        !window.confirm(
-                          "Are you sure you want to Cancel Survey?"
-                        )
-                      ) {
-                        e.preventDefault(); // Prevent navigation if the user cancels
-                      }
+                      e.preventDefault();
+
+                      Swal.fire({
+                        title: "Are you sure?",
+                        text: "Do you really want to cancel the survey?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, Cancel it!",
+                        cancelButtonText: "No, Keep it",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          formRef?.current?.reset();
+                          window.location.reload();
+                          setShowScreen("Vehicles");
+                          GetLIveData();
+                        }
+                      });
                     }}
-                    href="?"
-                    className="btn btn-label-danger position-absolute bottom-0 mb-2 start-10"
+                    className="btn btn-label-danger my-3"
                   >
-                    <span className="fs-6 me-1">&times; </span> Cancel Survey
-                  </a>
+                    <span className="fs-6 me-1">&times;</span> Cancel Survey
+                  </button>
                 ) : (
-                  <></>
+                  ""
                 )}
               </div>
 
@@ -1917,11 +2275,10 @@ export default function GateIN() {
               </div>
 
               <Footer />
-              <div className="content-backdrop fade"></div>
+              {/* <div className="content-backdrop fade"></div> */}
             </div>
           </div>
         </div>
-        <div className="layout-overlay layout-menu-toggle"></div>
         <div className="drag-target"></div>
       </div>
     </>
